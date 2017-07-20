@@ -548,9 +548,14 @@ int LinearFeature::Finish( bool closed, unsigned int idx )
                 poly.SetTexParams( prev_inner, width, 1.0f, heading );
                 poly.SetTexLimits( 0, last_end_v, 1, 1 );
                 poly.SetTexMethod( TG_TEX_BY_TPS_CLIPU, -1.0, 0.0, 1.0, 0.0 );
-                marking_polys.push_back(poly);
+                tgRectangle box1 = poly.GetBoundingBox();
+                if( SGGeodesy::distanceM( box1.getMin(), box1.getMax() ) > 5 ) {
+                  marking_polys.push_back(poly);
+                  last_end_v = (double)1.0f - (fmod( (double)(dist - last_end_v), (double)1.0f ));
+                } else {
+                  SG_LOG(SG_ALL,SG_ALERT, "dropping small poly " );
+                }
 
-                last_end_v = (double)1.0f - (fmod( (double)(dist - last_end_v), (double)1.0f ));
             } else {
                 markStarted = true;
             }
